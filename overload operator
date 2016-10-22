@@ -110,11 +110,11 @@ istream &operator>>(istream &os, Array &obj)
 	}
 	return os;
 }
-void printulove(Array &obj,char *intro)
+void printulove(Array &obj, char *intro)
 {
 	for (int i = 0, max = obj.getLength(); i < max; i++)
 	{
-		cout <<intro<<":"<< obj[i] << endl;
+		cout << intro << ":" << obj[i] << endl;
 	}
 }
 void main()
@@ -126,14 +126,14 @@ void main()
 	}
 	printulove(myarray, "单纯的打印");
 	//赋值操作要重载，因为是浅拷贝
-	Array myA(2),myB(3);
-	myA=myB = myarray;
+	Array myA(2), myB(3);
+	myA = myB = myarray;
 	printulove(myA, "赋值重载之myA");
 	printulove(myB, "赋值重载之myB");
 	//对象初始化的处理工作
 	//初始化也是浅拷贝需要重写
 	Array myC = myarray;
-	printulove(myB, "myC");
+	printulove(myC, "myC");
 	//重载==
 	Array myD(1);
 	myD[0] = 4;
@@ -155,7 +155,7 @@ void main()
 		cout << "myarray != myE" << endl;
 	for (int i = 0; i < 5; i++)
 	{
-		myE[i] = i +6;
+		myE[i] = i + 6;
 	}
 	cout << myarray << myE;
 	Array myF(5);
