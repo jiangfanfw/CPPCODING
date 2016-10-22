@@ -1,0 +1,166 @@
+#include <iostream>
+using namespace std;
+//数组类，数组类型
+//支持a=b=c; cout<<a<<endl;还有对象的初始化
+class Array
+{
+public:
+	Array(int length);
+	~Array();
+	Array(const Array &obj);
+	int getLength();
+	//为了当左值 需要返回引用
+	int &operator[](int index);
+	//参数a也加个引用,因对象做形参，会进入拷贝构造函数
+	Array &operator=(Array &a);
+	bool operator==(Array &a);
+	bool operator!=(Array &a);
+	//<<>> 因为左边那个参数是ostream改为全局,使用友元函数来弄
+	//返回引用支持链式操作
+	friend ostream &operator<<(ostream &os, Array &obj);
+	friend istream &operator>>(istream &os, Array &obj);
+private:
+	int length;
+	int *myspace;
+};
+Array::Array(int length)
+{
+	if (length < 0)
+		length = 0;
+	this->length = length;
+	this->myspace = new int[this->length];
+}
+Array::~Array()
+{
+	if (myspace)
+		delete[] myspace;
+}
+Array::Array(const Array &obj)
+{
+	this->length = obj.length;
+	//不需要删除旧内存，因为本身就是初始化
+	this->myspace = new int[obj.length];
+	for (int i = 0; i < this->length; i++)
+	{
+		this->myspace[i] = obj.myspace[i];
+	}
+}
+//引用返回变量本身
+int &Array::operator[](int index)
+{
+	if (index >= length)
+	{
+		cout << "index is out of range" << endl;
+	}
+	return myspace[index];
+}
+//这样符号支持连等号了 a=b=c; =号是自右至左,先 b=c 然后 a=...
+//完美
+Array &Array::operator=(Array &a)
+{
+	//删除旧的内存
+	if (this->myspace)
+		delete[] this->myspace;
+	//指向新的内存空间
+	this->length = a.length;
+	this->myspace = new int[this->length];
+	//赋值 
+	for (int i = 0; i < this->length; i++)
+	{
+		this->myspace[i] = a.myspace[i];
+	}
+	return *this;
+}
+bool Array::operator==(Array &a)
+{
+	//先比较个数是否相等
+	if (this->length != a.length)
+		return false;
+	for (int i = 0; i < a.length; i++)
+	{
+		if (this->myspace[i] != a.myspace[i])
+			return false;
+	}
+	return true;
+}
+bool Array::operator!=(Array &a)
+{
+	if (*this == a)
+		return false;
+	return true;
+}
+int Array::getLength()
+{
+	return length;
+}
+ostream &operator<<(ostream &os, Array &obj)
+{
+	for (int i = 0, max = obj.length; i < max; i++)
+	{
+		os << obj.myspace[i];
+	}
+	os << endl;
+	return os;
+}
+istream &operator>>(istream &os, Array &obj)
+{
+	for (int i = 0, max = obj.length; i < max; i++)
+	{
+		os >> obj.myspace[i];
+	}
+	return os;
+}
+void printulove(Array &obj,char *intro)
+{
+	for (int i = 0, max = obj.getLength(); i < max; i++)
+	{
+		cout <<intro<<":"<< obj[i] << endl;
+	}
+}
+void main()
+{
+	Array myarray(5);
+	for (int i = 0; i < 5; i++)
+	{
+		myarray[i] = i + 1;
+	}
+	printulove(myarray, "单纯的打印");
+	//赋值操作要重载，因为是浅拷贝
+	Array myA(2),myB(3);
+	myA=myB = myarray;
+	printulove(myA, "赋值重载之myA");
+	printulove(myB, "赋值重载之myB");
+	//对象初始化的处理工作
+	//初始化也是浅拷贝需要重写
+	Array myC = myarray;
+	printulove(myB, "myC");
+	//重载==
+	Array myD(1);
+	myD[0] = 4;
+	if (myarray == myD)
+		cout << "myD equal myarray" << endl;
+	else
+		cout << "myD not equal myarray" << endl;
+	Array myE(5);
+	for (int i = 0; i < 5; i++)
+	{
+		myE[i] = i + 1;
+	}
+	if (myarray == myE)
+		cout << "myE equal myarray" << endl;
+	else
+		cout << "myE not equal myarray" << endl;
+	myE[2] = 33;
+	if (myarray != myE)
+		cout << "myarray != myE" << endl;
+	for (int i = 0; i < 5; i++)
+	{
+		myE[i] = i +6;
+	}
+	cout << myarray << myE;
+	Array myF(5);
+	cout << "请输入5个数" << endl;
+	cin >> myF;
+	printulove(myF, "myF");
+	system("pause");
+}
