@@ -1,0 +1,166 @@
+#include <iostream>
+using namespace std;
+class MyString
+{
+	friend ostream& operator<<(ostream &out, const MyString &s);
+public: //构造和析构
+	MyString(int len = 0);
+	MyString(const char *p);
+	MyString(const MyString& obj);
+	~MyString();
+public: //操作符重载
+	MyString& operator=(const char *p);
+	MyString& operator=(const MyString& obj);
+	char& operator[](int index) const;
+public:
+	bool operator==(const char* p) const;
+	bool operator!=(const char* p) const;
+	bool operator==(const MyString& s) const;//修饰this指针
+	bool operator!=(const MyString& s) const;
+public: //string to c
+	char *c_str();
+	const char* c_str() const;
+	int length()
+	{
+		return m_len;
+	}
+public:
+	int operator<(const char *p);
+	int operator>(const char *p);
+	int operator<(const MyString &s);
+	int operator>(const MyString &s);
+private:
+	int m_len;
+	char	*m_p=NULL;
+};
+MyString::MyString(int len)
+{
+	this->m_len = len+1;
+	m_p = new char[this->m_len];
+}
+MyString::MyString(const char *p)
+{
+	//NULL的情况下给一个字节装0
+	if (p == NULL)
+	{
+		this->m_len = 1;
+		p = "";
+	}
+	else
+	{
+		this->m_len = strlen(p) + 1;		
+	}
+	//申请内存空间
+	m_p = new char[this->m_len];
+	strcpy_s(this->m_p, this->m_len, p);
+}
+MyString::MyString(const MyString& obj)
+{
+	this->m_len = obj.m_len;
+	this->m_p = new char[this->m_len];
+	strcpy_s(this->m_p, this->m_len, obj.m_p);
+}
+MyString::~MyString()
+{
+	if (m_p)
+		delete[] m_p;
+}
+//重载等号操作
+MyString& MyString::operator=(const MyString& obj)
+{
+	this->m_len = obj.m_len;
+	this->m_p = new char[this->m_len];
+	strcpy_s(this->m_p, this->m_len, obj.m_p);
+	return *this;
+}
+//重载"="操作
+MyString& MyString:: operator=(const char *p)
+{
+	//删除旧内存
+	if (this->m_p)
+		delete[] this->m_p;
+	if (p == NULL)
+	{
+		this->m_len = 0;
+		this->m_p = NULL;
+	}
+	else
+	{
+		this->m_len = strlen(p) + 1;
+		//申请内存空间
+		m_p = new char[this->m_len];
+		strcpy_s(this->m_p, this->m_len, p);
+	}
+	return *this;
+}
+//得到每一个字符的值
+char& MyString::operator[](int index) const
+{
+	if (index >= this->m_len)
+		return this->m_p[this->m_len-1];
+	return this->m_p[index];
+}
+bool MyString::operator==(const char* p) const
+{
+	return strcmp(this->m_p, p) == 0 ? true : false;
+}
+bool MyString::operator!=(const char* p) const
+{
+	return this->m_p == p ? false : true;
+}
+bool MyString::operator==(const MyString& s) const//修饰this指针
+{
+	return strcmp(this->m_p, s.m_p) == 0 ? true : false;
+}
+bool MyString::operator!=(const MyString& s) const
+{
+	return this->m_p == s.m_p ? false : true;
+}
+char *MyString::c_str()
+{
+	return this->m_p;
+}
+const char* MyString::c_str() const//修饰this this的内存空间也不能赋值
+{
+	return this->m_p;
+}
+//int MyString::operator<(const char *p)
+//{
+//
+//}
+//int MyString::operator>(const char *p)
+//{
+//
+//}
+//int MyString::operator<(const MyString &s)
+//{
+//
+//}
+//int MyString::operator>(const MyString &s)
+//{
+//
+//}
+void main()
+{
+	char *p = NULL;
+	MyString str(p),strp("jiangfan");
+	cout <<"str:" <<str.c_str() << endl;
+	str = strp;
+	cout << "str:" << str.c_str() << endl;
+	MyString strA = strp;
+	cout << "strA:" << strA.c_str() << endl;
+	strA = strp = "abc";
+	cout << "strA one more time:" << strA.c_str() << endl;
+	MyString strB("def");
+	if (strA!=strB)
+		cout << "string not equal"<< endl;
+	strB = "";
+	cout << "strB:" << strB.c_str() << endl;
+	if (strA == "abc")
+		cout << "strA equal" << endl;
+	if (strB != "jiangfan")
+		cout << "strB != jiangfan" << endl;
+	cout << "strA[0]:" << strA[0] << endl;
+	cout << "strA[10]:" << strA[10] << endl;
+	system("pause");
+}
